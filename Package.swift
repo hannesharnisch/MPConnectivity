@@ -25,8 +25,8 @@ let package = Package(
             name: "MPConnectivity",
             dependencies: []),
         .target(
-        name: "MPConnectivityView",
-        dependencies: ["MPConnectivity"]),
+            name: "MPConnectivityView",
+            dependencies: ["MPConnectivity"]),
         .testTarget(
             name: "MPConnectivityTests",
             dependencies: ["MPConnectivity"]),
