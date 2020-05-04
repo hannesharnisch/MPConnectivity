@@ -13,8 +13,8 @@ public class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
     var mcSession:MCSession!
     var mcBrowser:MCNearbyServiceBrowser!
     public var delegate:MCClientDelegate!
-    var currentHost:MCPeerID!
-    var me:MCPeerID
+    public var currentHost:MCPeerID!
+    public var me:MCPeerID
     var deviceName:String
     var name = ""
     var SERVICE_TYPE:String
@@ -61,7 +61,7 @@ public class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
         }
         self.stop()
     }
-    func start(name:String){
+    public func start(name:String){
         self.name = name
         isRunning = true
         print("STARTING CLIENT")
@@ -72,7 +72,7 @@ public class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
         mcBrowser.delegate = self
         mcBrowser.startBrowsingForPeers()
     }
-    func stop(){
+    public func stop(){
         isRunning = false
         print("STOPPING CLIENT")
         mcBrowser.stopBrowsingForPeers()
@@ -83,11 +83,11 @@ public class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
         discoveredPeers = []
         currentHost = nil
     }
-    func reset(){
+    public func reset(){
         self.stop()
         self.start(name: name)
     }
-    func invite(peer:String)->Bool{
+    public func invite(peer:String)->Bool{
         let peers = discoveredPeers.filter { (discovered) -> Bool in
             return peer == discovered.peerId.displayName
         }
@@ -95,7 +95,7 @@ public class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
         print(peers[0].peerId.displayName)
         return self.sendRequestToConnect(to: peers[0].peerId)
     }
-    func sendRequestToConnect(to:MCPeerID) -> Bool{
+    public func sendRequestToConnect(to:MCPeerID) -> Bool{
         let index = self.discoveredPeers.lastIndex { (discovered) -> Bool in
             return discovered.peerId == to
         }
@@ -107,7 +107,7 @@ public class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
             return false
         }
     }
-    func send(data:Data,to:MCPeerOptions) ->Bool{
+    public func send(data:Data,to:MCPeerOptions) ->Bool{
         do{
             switch to{
             case .all:

@@ -11,7 +11,7 @@ import MultipeerConnectivity
 public class MCHost:NSObject,MCSessionDelegate,MCNearbyServiceAdvertiserDelegate{
     var mcSession:MCSession!
     var mcAdvertiserAssistent:MCNearbyServiceAdvertiser!;
-    var me:MCPeerID
+    public var me:MCPeerID
     var deviceName:String
     var name = ""
     public var delegate:MCHostDelegate!
