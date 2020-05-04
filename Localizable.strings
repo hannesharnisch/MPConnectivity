@@ -1,0 +1,68 @@
+/*
+  Localizable.strings
+  WeParty
+
+  Created by Hannes Harnisch on 21.04.20.
+  Copyright © 2020 hannes.harnisch. All rights reserved.
+*/
+
+/* Touch to start description */
+"touchToStart" = "Touch to Start!";
+
+/* connect word */
+"connect" = "Connect";
+
+/* connection word */
+"connection" = "Connection";
+
+/* people word */
+"people" = "people";
+
+/* me word */
+"me" = "Me";
+
+/* My word */
+"my" = "My";
+
+/* Music word */
+"music" = "music";
+
+//AskingView
+/* party start or join Question */
+"startingorJoiningParyQuestion" = "Do you want to start or join a Party?";
+
+/* party start */
+"startParty" = "Start Party";
+
+/* party join */
+"joinParty" = "Join Party";
+
+//ConnectionView
+/* join word */
+"join" = "join";
+
+/* PartyHost word */
+"PartyHost" = "PartyHost";
+
+/* PartyHosts word */
+"PartyHosts" = "PartyHosts";
+
+/* searching for text */
+"searchingFor" = "Searching for";
+
+/* discovered word */
+"discovered" = "Discovered";
+
+/* connected word */
+"connected" = "Connected";
+
+
+//SendingView
+
+/* select Music button */
+"selectMusic" = "Select Music";
+
+/* next Songs label */
+"nextSongs" = "Next Songs";
+
+
