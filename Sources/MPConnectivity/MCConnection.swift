@@ -8,7 +8,7 @@
 import Foundation
 import MultipeerConnectivity
 
-class MCConnection{
+public class MCConnection{
     var peerId:MCPeerID
     var mcSession:MCSession
     var status = MCStatus.connected
@@ -41,7 +41,7 @@ class MCConnection{
     }
     
 }
-enum MCStatus{
+public enum MCStatus{
     case connected
     case keepAlive
     case disconnected

@@ -8,13 +8,14 @@
 import Foundation
 import MultipeerConnectivity
 
-class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
+public class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
     var isRunning = false
     var mcSession:MCSession!
     var mcBrowser:MCNearbyServiceBrowser!
-    var delegate:MCClientDelegate!
+    public var delegate:MCClientDelegate!
     var currentHost:MCPeerID!
-    var me = MCPeerID(displayName: UIDevice.current.name)
+    var me:MCPeerID
+    var deviceName:String
     var name = ""
     var SERVICE_TYPE:String
     var connections = [MCConnection](){
@@ -33,8 +34,10 @@ class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
             }
         }
     }
-    init(SERVICE_TYPE:String){
+    public init(SERVICE_TYPE:String,deviceName:String){
         self.SERVICE_TYPE = SERVICE_TYPE
+        self.deviceName = deviceName
+        self.me = MCPeerID(displayName: deviceName)
         super.init()
         //let notificationCenter = NotificationCenter.default
         //notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.willResignActiveNotification, object: nil)
@@ -62,7 +65,7 @@ class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
         self.name = name
         isRunning = true
         print("STARTING CLIENT")
-        self.me = MCPeerID(displayName: "\(name)-\(UIDevice.current.name)")
+        self.me = MCPeerID(displayName: "\(name)-\(self.deviceName)")
         mcSession = MCSession(peer: self.me, securityIdentity: nil, encryptionPreference: .required);
         mcSession.delegate = self
         mcBrowser = MCNearbyServiceBrowser(peer: self.me, serviceType: SERVICE_TYPE)
@@ -119,7 +122,7 @@ class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
             return false
         }
     }
-    func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
+    public func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         switch state {
         case .connected:
             print("Connected")
@@ -140,7 +143,7 @@ class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
         }
     }
     
-    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+    public func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         let text = String(data: data, encoding: .utf8)
         print("DID RECIEVE")
         if text == "exit"{
@@ -153,19 +156,19 @@ class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
         }
     }
     
-    func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
+    public func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
         
     }
     
-    func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
+    public func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
         
     }
     
-    func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
+    public func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
         
     }
     
-    func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
+    public func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
         let index = self.discoveredPeers.lastIndex { (discoverd) -> Bool in
             return discoverd.peerId.displayName == peerID.displayName
         }
@@ -176,7 +179,7 @@ class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
         }
     }
     
-    func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
+    public func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
         self.discoveredPeers.removeAll { (discovered) -> Bool in
             return discovered.peerId == peerID
         }
@@ -184,7 +187,7 @@ class MCClient:NSObject,MCSessionDelegate,MCNearbyServiceBrowserDelegate{
     
     
 }
-protocol MCClientDelegate {
+public protocol MCClientDelegate {
     func didUpdate(foundPeers to:[MCPeerID])
     func didUpdate(Connections to:[MCPeerID])
     func didRecieve(data:Data,from:MCPeerID)

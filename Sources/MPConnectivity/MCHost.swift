@@ -8,12 +8,13 @@
 import Foundation
 import MultipeerConnectivity
 
-class MCHost:NSObject,MCSessionDelegate,MCNearbyServiceAdvertiserDelegate{
+public class MCHost:NSObject,MCSessionDelegate,MCNearbyServiceAdvertiserDelegate{
     var mcSession:MCSession!
     var mcAdvertiserAssistent:MCNearbyServiceAdvertiser!;
-    var me = MCPeerID(displayName: UIDevice.current.name)
+    var me:MCPeerID
+    var deviceName:String
     var name = ""
-    var delegate:MCHostDelegate!
+    public var delegate:MCHostDelegate!
     var SERVICE_TYPE:String
     
     var connections = [MCConnection](){
@@ -32,8 +33,10 @@ class MCHost:NSObject,MCSessionDelegate,MCNearbyServiceAdvertiserDelegate{
             }
         }
     }
-    init(SERVICE_TYPE:String) {
+    public init(SERVICE_TYPE:String,deviceName:String) {
         self.SERVICE_TYPE = SERVICE_TYPE
+        self.deviceName = deviceName
+        self.me = MCPeerID(displayName: deviceName)
         super.init()
     }
     deinit {
@@ -41,28 +44,28 @@ class MCHost:NSObject,MCSessionDelegate,MCNearbyServiceAdvertiserDelegate{
         self.mcSession.disconnect()
         self.mcSession = nil
     }
-    func start(name:String){
+    public func start(name:String){
         print("START HOST")
         self.name = name
-        self.me = MCPeerID(displayName: "\(name)-\(UIDevice.current.name)")
+        self.me = MCPeerID(displayName: "\(name)-\(self.deviceName)")
         mcSession = MCSession(peer: self.me, securityIdentity: nil, encryptionPreference: .required);
         mcSession.delegate = self;
         self.mcAdvertiserAssistent = MCNearbyServiceAdvertiser(peer: self.me, discoveryInfo: nil, serviceType: self.SERVICE_TYPE)
         mcAdvertiserAssistent.delegate = self
         mcAdvertiserAssistent.startAdvertisingPeer()
     }
-    func stop(){
+    public func stop(){
         print("STOP HOST")
         mcAdvertiserAssistent.stopAdvertisingPeer()
         self.mcSession.disconnect()
         connections = []
         invitations = []
     }
-    func disconnectPeer(peer:String) ->Bool{
+    public func disconnectPeer(peer:String) ->Bool{
         print("Disconnect: \(peer)")
         return self.send(data: "exit".data(using: .utf8)!, to: .withName(names: [peer]))
     }
-    func connection(accept:Bool,peer:MCPeerID){
+    public func connection(accept:Bool,peer:MCPeerID){
         let peer = invitations.filter { (invit) -> Bool in
             return invit.peerId == peer
         }
@@ -74,7 +77,7 @@ class MCHost:NSObject,MCSessionDelegate,MCNearbyServiceAdvertiserDelegate{
             }
         }
     }
-    func send(data:Data,to:MCPeerOptions) ->Bool{
+    public func send(data:Data,to:MCPeerOptions) ->Bool{
         do{
             switch to{
             case .all:
@@ -90,7 +93,7 @@ class MCHost:NSObject,MCSessionDelegate,MCNearbyServiceAdvertiserDelegate{
             return false
         }
     }
-    func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
+    public func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         switch state {
         case .connected:
             let con = self.connections.first { (con) -> Bool in
@@ -117,7 +120,7 @@ class MCHost:NSObject,MCSessionDelegate,MCNearbyServiceAdvertiserDelegate{
         }
     }
     
-    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+    public func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         if let string = String(data: data, encoding: .utf8){
             print(string)
             if string == "keepAlive"{
@@ -137,19 +140,19 @@ class MCHost:NSObject,MCSessionDelegate,MCNearbyServiceAdvertiserDelegate{
         }
     }
     
-    func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
+    public func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
         
     }
     
-    func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
+    public func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
         
     }
     
-    func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
+    public func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
         
     }
     
-    func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
+    public func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
         print("INVITATION")
         if (self.invitations.firstIndex(where: { (discovered) -> Bool in
             return discovered.peerId == peerID
@@ -159,14 +162,14 @@ class MCHost:NSObject,MCSessionDelegate,MCNearbyServiceAdvertiserDelegate{
         }
     }
 }
-struct DiscoveredPeer:Equatable{
-    static func == (lhs: DiscoveredPeer, rhs: DiscoveredPeer) -> Bool {
+public struct DiscoveredPeer:Equatable{
+    public static func == (lhs: DiscoveredPeer, rhs: DiscoveredPeer) -> Bool {
         return lhs.peerId == rhs.peerId
     }
-    var id = UUID()
-    var peerId:MCPeerID
-    var invitationHandler:((Bool, MCSession?) -> Void)?
-    static func getPeers(peers:[DiscoveredPeer]) ->[MCPeerID]{
+    public var id = UUID()
+    public var peerId:MCPeerID
+    public var invitationHandler:((Bool, MCSession?) -> Void)?
+    public static func getPeers(peers:[DiscoveredPeer]) ->[MCPeerID]{
         var peerids:[MCPeerID] = []
         for peer in peers{
             peerids.append(peer.peerId)
@@ -174,12 +177,12 @@ struct DiscoveredPeer:Equatable{
         return peerids
     }
 }
-enum MCPeerOptions{
+public enum MCPeerOptions{
     case all
     case withName(names:[String])
     case host
 }
-protocol MCHostDelegate {
+public protocol MCHostDelegate {
     func didUpdate(Invitations to:[MCPeerID])
     func didUpdate(Connections to:[MCPeerID])
     func didRecieve(data:Data,from:MCPeerID)
