@@ -11,8 +11,8 @@ let package = Package(
             name: "MPConnectivity",
             targets: ["MPConnectivity"]),
         .library(
-        name: "MPConnectivityView",
-        targets: ["MPConnectivityView"]),
+            name: "MPConnectivityView",
+            targets: ["MPConnectivityView"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.

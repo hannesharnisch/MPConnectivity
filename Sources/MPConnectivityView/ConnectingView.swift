@@ -5,11 +5,12 @@
 //  Created by Hannes Harnisch on 25.04.20.
 //  Copyright © 2020 hannes.harnisch. All rights reserved.
 //
-#if os(iOS)
+
 import SwiftUI
 import MPConnectivity
 import MultipeerConnectivity
 
+#if os(iOS)
 public struct ConnectingView<T:ConnectivityEnabled>: View {
     @Binding var discoveredPeers:[MCPeerID]
     @Binding var connectedPeers:[MCPeerID]
